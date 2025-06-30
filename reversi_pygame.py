@@ -34,6 +34,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Reversi")
 font = pygame.font.Font(None, 24)
 
+def debug_log(msg):
+    print(msg)
+
 class ReversiEngine:
     def __init__(self):
         self.board = [[ID_STONE_NONE for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
@@ -215,6 +218,20 @@ class ReversiGame:
         message_surface = font.render(self.message, True, BLACK)
         screen.blit(message_surface, (20, SCREEN_HEIGHT - 40))
     
+    def print_board(self):
+        print("Current board:")
+        for y in range(BOARD_SIZE):
+            row = ''
+            for x in range(BOARD_SIZE):
+                v = self.engine.get_stone(x, y)
+                if v == ID_STONE_BLACK:
+                    row += 'B '
+                elif v == ID_STONE_WHITE:
+                    row += 'W '
+                else:
+                    row += '. '
+            print(row)
+
     def run(self):
         """Main game loop"""
         running = True
@@ -238,6 +255,8 @@ class ReversiGame:
                         # Try to place stone
                         current_color = ID_STONE_BLACK if self.game_turn == GAME_TURN_BLACK else ID_STONE_WHITE
                         if self.engine.check_position(self.cursor_x, self.cursor_y, current_color, True):
+                            print(f"Player ({'Black' if current_color == ID_STONE_BLACK else 'White'}) moves to ({self.cursor_x}, {self.cursor_y})")
+                            self.print_board()
                             self.game_turn = not self.game_turn
                             self.check_game_status()
             
@@ -247,9 +266,57 @@ class ReversiGame:
                 pygame.display.flip()
                 pygame.time.wait(500)
                 
+                # Find AI move for debug
+                move_found = False
+                for j in range(BOARD_SIZE):
+                    for i in range(BOARD_SIZE):
+                        if self.engine.check_position(i, j, ID_STONE_BLACK, False):
+                            move_found = (i, j)
+                            break
+                    if move_found:
+                        break
                 if self.engine.ai_move(ID_STONE_BLACK):
+                    if move_found:
+                        print(f"AI (Black) moves to {move_found}")
+                    else:
+                        print("AI (Black) made a move.")
+                    self.print_board()
                     self.game_turn = GAME_TURN_WHITE
                     self.check_game_status()
+                else:
+                    # No valid move for AI, check if player can move
+                    print("AI (Black) passes (no valid moves)")
+                    self.print_board()
+                    player_status = self.engine.game_status_check(ID_STONE_WHITE)
+                    if player_status == "BLACK_PASS" or player_status == "WHITE_PASS" or player_status == "END":
+                        print("Game ended. No valid moves for either side.")
+                        black_score, white_score = self.engine.count_score()
+                        print(f"Final Score - Black: {black_score}, White: {white_score}")
+                        self.print_board()
+                        self.check_game_status()
+                        running = False
+                        continue
+                    else:
+                        # Show AI pass message and wait for Enter
+                        print("AI (Black) passes. Press Enter to continue.")
+                        self.draw_board()
+                        self.draw_stones()
+                        self.draw_cursor(self.cursor_x, self.cursor_y)
+                        self.draw_info()
+                        message_surface = font.render("AI passes! Press Enter to continue.", True, RED)
+                        screen.blit(message_surface, (20, SCREEN_HEIGHT - 80))
+                        pygame.display.flip()
+                        waiting_pass = True
+                        while waiting_pass:
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    running = False
+                                    waiting_pass = False
+                                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                                    waiting_pass = False
+                            pygame.time.wait(100)
+                        # Pass turn to player
+                        self.game_turn = GAME_TURN_WHITE
             
             # Draw everything
             self.draw_board()
@@ -259,6 +326,12 @@ class ReversiGame:
             
             pygame.display.flip()
             clock.tick(60)
+            
+            # Game end debug
+            current_color = ID_STONE_BLACK if self.game_turn == GAME_TURN_BLACK else ID_STONE_WHITE
+            if self.engine.game_status_check(current_color) == "END":
+                print("Game ended.")
+                self.print_board()
         
         pygame.quit()
         sys.exit()

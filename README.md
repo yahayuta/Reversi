@@ -2,8 +2,9 @@
 
 This project contains a Pygame implementation of the Reversi game, migrated from the original GBA (Game Boy Advance) version.
 
-## Files
+## Project Structure
 
+### Main Files (Root Directory)
 - `reversi_pygame.py` - Basic Pygame implementation with simple AI
 - `reversi_advanced.py` - Advanced implementation with complete menu system and minimax AI (now with larger display and improved pass/game end logic)
 - `requirements.txt` - Python dependencies
@@ -11,6 +12,17 @@ This project contains a Pygame implementation of the Reversi game, migrated from
 - `play_reversi.bat` - Simple Windows batch file to run advanced version
 - `run_reversi.ps1` - PowerShell script launcher with better error handling
 - `README.md` - This file
+- `LICENSE` - MIT License
+
+### GBA Source Code (`gba/` directory)
+- Original GBA source files (`.c`, `.h`, `.S`)
+- Build artifacts (`.o`, `.gba`, `.elf`, `.map`)
+- Build system files (`Makefile`, `lnkscript`, `make1.bat`)
+- Documentation (`.docx` files)
+
+### Assets
+- `bitmaps/` - Original GBA graphics assets
+- `TeamKNOx/` - GBA development library files
 
 ## Display Size
 
@@ -82,7 +94,7 @@ python reversi_advanced.py
 
 ## Migration Details
 
-The Pygame version maintains the same game logic and structure as the original GBA version:
+The Pygame version maintains the same game logic and structure as the original GBA version. The original GBA source code and build artifacts are preserved in the `gba/` directory for reference.
 
 ### Preserved Elements
 - **Constants**: All board dimensions, colors, and game states

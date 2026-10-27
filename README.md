@@ -2,6 +2,18 @@
 
 This project contains a Pygame implementation of the Reversi game, migrated from the original GBA (Game Boy Advance) version.
 
+## Quickstart
+
+Install [uv](https://docs.astral.sh/uv/) and run either:
+
+```bash
+# Basic version
+uv run reversi_pygame.py
+
+# Advanced version
+uv run reversi_advanced.py
+```
+
 ## Project Structure
 
 ### Main Files (Root Directory)
